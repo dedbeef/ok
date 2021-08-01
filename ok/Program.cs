@@ -192,6 +192,10 @@ namespace ok
         /// <returns>An IOkPlugin command from the loaded commands matching the arguments, otherwise null</returns>
         static IOkPlugin GetCommandFromArgs(string[] args)
         {
+            if(args == null || args.Length == 0)
+            {
+                return null;
+            }
             return commands.FirstOrDefault(x => x.Command.ToLower() == args[0].ToLower());
         }
 
@@ -340,7 +344,11 @@ namespace ok
                         var binFiles = new DirectoryInfo(fullBinaryPath).GetFiles("*.dll", SearchOption.TopDirectoryOnly);
                         foreach (var pluginBinary in binFiles)
                         {
-                            loadedPlugin = LoadPluginIfNewer(pluginBinary, ref highestVersionFound);
+                            var nextPlugin = LoadPluginIfNewer(pluginBinary, ref highestVersionFound);
+                            if(nextPlugin != null)
+                            {
+                                loadedPlugin = nextPlugin;
+                            }
                         }
                     }
                 }
@@ -368,7 +376,7 @@ namespace ok
                         if (typeof(IOkPlugin).IsAssignableFrom(type))
                         {
                             plugin = (IOkPlugin)asm.CreateInstance(type.FullName);
-                            plugin.GetType().GetProperty("SourceDirectory", BindingFlags.Public | BindingFlags.Instance).SetValue(plugin, pluginBinary.Directory);
+                            plugin.GetType().GetProperty("SourceDirectory", BindingFlags.Public | BindingFlags.Instance).SetValue(plugin, pluginBinary.Directory.FullName);
                             if (plugin.Version > highestVersionFound)
                             {
                                 highestVersionFound = plugin.Version;
