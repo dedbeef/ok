@@ -174,11 +174,11 @@ namespace ok
         /// <returns>A Request parsed from the first argument, otherwise Request.Command</returns>
         static Request GetRequestFromArgs(string[] args)
         {
-            if(args == null || args.Length == 0)
+            if(args == null)
             {
                 return Request.Command;
             }
-            if (args.Length == 0 && Enum.TryParse(args[0], out Request parsedRequest))
+            if (args.Length > 0 && Enum.TryParse(args[0], out Request parsedRequest))
             {
                 return parsedRequest;
             }
